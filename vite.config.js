@@ -1,6 +1,15 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
+    publicDir: "resources",
+    optimizeDeps: {
+        link: ['@mkkellogg/gaussian-splats-3d']
+    },
+    server: {
+        watch: {
+            usePolling: true
+        }
+    },
     plugins: [{
         name: "configure-response-headers",
         configureServer: (server) => {
@@ -10,5 +19,5 @@ export default defineConfig({
                 next();
             });
         },
-    }, ],
+    },],
 });
