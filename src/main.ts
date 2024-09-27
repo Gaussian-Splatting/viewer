@@ -29,8 +29,11 @@ class SightInViewer {
       canvas
     });
 
-    renderer.setSize(canvas.width, canvas.height)
-    renderer.setPixelRatio(window.devicePixelRatio)
+
+    const dpr = window.devicePixelRatio
+
+    renderer.setSize(canvas.width / dpr, canvas.height / dpr)
+    renderer.setPixelRatio(dpr)
     renderer.setClearColor(new THREE.Color(0xeeeeee), 1.0)
     // TODO :  handle resize 
 
@@ -47,7 +50,7 @@ class SightInViewer {
 
     this.viewer.controls.enableDamping = false
 
-    DragHandler.initEvents(file => this.startViewerWithFile(file))
+    DragHandler.initEvents((file: File) => this.startViewerWithFile(file))
     if (DEBUG) {
       // Load the default scene
       this.startViewerWithFile("./resources/models/BAM-1K-10K-2200p_60ksteps.ply")
