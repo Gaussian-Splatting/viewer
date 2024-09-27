@@ -50,7 +50,7 @@ class SightInViewer {
     DragHandler.initEvents(file => this.startViewerWithFile(file))
     if (DEBUG) {
       // Load the default scene
-      this.startViewerWithFile("./resources/BAM-1K-10K-2200p_60ksteps.ply")
+      this.startViewerWithFile("./resources/models/BAM-1K-10K-2200p_60ksteps.ply")
     }
   }
 
