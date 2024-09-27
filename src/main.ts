@@ -1,51 +1,74 @@
 import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
 import * as THREE from 'three';
 
+import { DragHandler } from './dragHandler'
+import { setCanvasDimensions } from './utils';
 
-const viewer = new GaussianSplats3D.Viewer({
-  cameraUp: [0.0, -1.0, 0.0],
-  initialCameraPosition: [-8.09653, -6.53072, -7.72696],
-  initialCameraLookAt: [0, 1.95338, 1.51278],
-  sphericalHarmonicsDegree: 1,
-  halfPrecisionCovariancesOnGPU: true,
-  dynamicScene: false,
-  splatRenderMode: GaussianSplats3D.RenderMode.ThreeD,
-});
+// Load a default scene and prevent drag and drop
+// This flag should only be use directly during the development of the viewer
+const DEBUG = false
 
-viewer.controls.enableDamping = false;
+const canvas = document.querySelector('canvas')!
 
-(window as any).viewer = viewer
+setCanvasDimensions(canvas, window.innerWidth, window.innerHeight)
 
-// Handle drag-and-drop
-window.addEventListener('drop', e => {
-  console.log('drop', e)
-  e.preventDefault()
 
-  if (e.dataTransfer.items) {
-    [...e.dataTransfer.items].forEach((item, i) => {
-      // If dropped items aren't files, reject them
-      if (item.kind === "file") {
-        const file = item.getAsFile();
-        main(file)
-      }
-    });
-  } else {
-    // Use DataTransfer interface to access the file(s)
-    [...e.dataTransfer.files].forEach((file, i) => {
-      main(file)
-    });
-  }
-
+window.addEventListener('load', _ => {
+  let sightInViewer = new SightInViewer();
+  (window as any).viewer = sightInViewer
 })
 
-window.addEventListener('load', e => main())
 
-async function main(file: File | null) {
-  const path = "./resources/BAM-1K-10K-2200p_60ksteps.ply"
-  viewer.addSplatScene(path, {
-    progressiveLoad: false, // Huge performance improvement
-    format: GaussianSplats3D.SceneFormat.Ply
-  }).then(() => { viewer.start(); });
-};
+class SightInViewer {
+  viewer: GaussianSplats3D.Viewer
+
+  constructor() {
+    const renderer = new THREE.WebGLRenderer({
+      antialias: false,
+      precision: 'highp',
+      canvas
+    });
+
+    renderer.setSize(canvas.width, canvas.height)
+    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setClearColor(new THREE.Color(0xeeeeee), 1.0)
+    // TODO :  handle resize 
+
+    this.viewer = new GaussianSplats3D.Viewer({
+      cameraUp: [0.0, -1.0, 0.0],
+      initialCameraPosition: [-8.09653, -6.53072, -7.72696],
+      initialCameraLookAt: [0, 1.95338, 1.51278],
+      sphericalHarmonicsDegree: 1,
+      halfPrecisionCovariancesOnGPU: true,
+      dynamicScene: false,
+      splatRenderMode: GaussianSplats3D.RenderMode.ThreeD,
+      renderer
+    })
+
+    this.viewer.controls.enableDamping = false
+
+    DragHandler.initEvents(file => this.startViewerWithFile(file))
+    if (DEBUG) {
+      // Load the default scene
+      this.startViewerWithFile("./resources/BAM-1K-10K-2200p_60ksteps.ply")
+    }
+  }
+
+  startViewerWithFile(file: File | string) {
+    if (file instanceof File) {
+      document.querySelector('#file-name')!.innerHTML = file.name
+    }
+
+    let viewerAddFunction = DEBUG ? this.viewer.addSplatScene : this.viewer.addSplatSceneFromFile
+    viewerAddFunction = viewerAddFunction.bind(this.viewer)
+    viewerAddFunction(file, {
+      progressiveLoad: false, // Huge performance improvement
+      format: GaussianSplats3D.SceneFormat.Ply,
+      onProgress: console.log
+
+    }).then(() => { this.viewer.start() })
+  }
+}
+
 
 

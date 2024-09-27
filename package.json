@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "./build.sh",
+    "build": "./build.sh",
     "preview": "vite preview"
   },
   "devDependencies": {
@@ -14,6 +15,6 @@
   },
   "dependencies": {
     "@mkkellogg/gaussian-splats-3d": "file:lib/GaussianSplats3D",
-        "three": ">=0.160.0"
+    "three": ">=0.160.0"
   }
 }
