@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
-resources/
+resources/models
 node_modules/
