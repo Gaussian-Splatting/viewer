@@ -9,9 +9,7 @@ import { setCanvasDimensions } from './utils';
 const DEBUG = false
 
 const canvas = document.querySelector('canvas')!
-
-setCanvasDimensions(canvas, window.innerWidth, window.innerHeight)
-
+setCanvasDimensions(canvas, window.innerWidth, window.innerHeight - 3.5 * 16) // header size = 3.5em
 
 window.addEventListener('load', _ => {
   let sightInViewer = new SightInViewer();
@@ -31,7 +29,6 @@ class SightInViewer {
 
 
     const dpr = window.devicePixelRatio
-
     renderer.setSize(canvas.width / dpr, canvas.height / dpr)
     renderer.setPixelRatio(dpr)
     renderer.setClearColor(new THREE.Color(0xeeeeee), 1.0)
