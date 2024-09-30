@@ -1,18 +1,18 @@
 {
   "name": "gaussian-splat-3d-viewer",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "./build.sh",
-    "preview": "vite preview"
+    "preview": "./build-preview.sh"
   },
+  "workspace": [ "lib/*" ],
   "devDependencies": {
+    "@types/three": "^0.169.0",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
   },
-  "dependencies": {
-    "@mkkellogg/gaussian-splats-3d": "file:lib/GaussianSplats3D"
-  }
+  "dependencies": { }
 }

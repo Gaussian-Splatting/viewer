@@ -1,16 +1,22 @@
+import path from 'path'
 import { defineConfig } from "vite";
 
 export default defineConfig({
     publicDir: "resources",
-    // optimizeDeps: {
-    //     link: ['@mkkellogg/gaussian-splats-3d'],
-    //     disabled: true
-    // },
-    // server: {
-    //     watch: { usePolling: true }
-    // },
+    optimizeDeps: {
+        include: ['@mkkellogg/gaussian-splats-3d'],
+    },
+    server: {
+        watch: { usePolling: true }
+    },
+    resolve: {
+        alias: {
+            '@mkkellogg/gaussian-splats-3d': './lib/GaussianSplats3D/build/gaussian-splats-3d.module.js'
+        }
+    },
     build: {
-        minify: false
+        minify: false,
+        rollupOptions: {}
     },
     plugins: [{
         name: "configure-response-headers",
@@ -20,13 +26,6 @@ export default defineConfig({
                 res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
                 next();
             });
-        },
-        configurePreviewServer: (server) => {
-            server.middlewares.use((_req, res, next) => {
-                res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-                res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-                next();
-            });
-        },
-    },],
+        }
+    }],
 });
