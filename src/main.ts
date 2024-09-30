@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { DragHandler } from './dragHandler'
 import { setCanvasDimensions } from './utils';
 
+
 // Load a default scene and prevent drag and drop
 // This flag should only be use directly during the development of the viewer
 const DEBUG = false
@@ -38,10 +39,15 @@ class SightInViewer {
       cameraUp: [0.0, -1.0, 0.0],
       initialCameraPosition: [-8.09653, -6.53072, -7.72696],
       initialCameraLookAt: [0, 1.95338, 1.51278],
-      sphericalHarmonicsDegree: 1,
+      sphericalHarmonicsDegree: 0,
       halfPrecisionCovariancesOnGPU: true,
       dynamicScene: false,
       splatRenderMode: GaussianSplats3D.RenderMode.ThreeD,
+      // sharedMemoryForWorkers: false,
+      // ignoreDevicePixelRatio: true,
+      // gpuAcceleratedSort: false,
+      // inMemoryCompressionLevel: 2,
+      // freeIntermediateSplatData: true,
       renderer
     })
 
@@ -50,7 +56,7 @@ class SightInViewer {
     DragHandler.initEvents((file: File) => this.startViewerWithFile(file))
     if (DEBUG) {
       // Load the default scene
-      this.startViewerWithFile("./resources/models/BAM-1K-10K-2200p_60ksteps.ply")
+      this.startViewerWithFile("./models/BAM-1K-10K-2200p_60ksteps.ply")
     }
   }
 

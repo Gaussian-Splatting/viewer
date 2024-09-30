@@ -1,4 +1,4 @@
-type HandlerCallback = (file: File | string) => any
+type HandlerCallback = (file: File) => any
 
 export class DragHandler {
     static readonly supportedExtensions = ['ply', 'splat', 'ksplat'];
