@@ -4,14 +4,13 @@ import * as THREE from 'three';
 import { DragHandler } from './dragHandler'
 import { setCanvasDimensions } from './utils';
 
+
 // Load a default scene and prevent drag and drop
 // This flag should only be use directly during the development of the viewer
 const DEBUG = false
 
 const canvas = document.querySelector('canvas')!
-
-setCanvasDimensions(canvas, window.innerWidth, window.innerHeight)
-
+setCanvasDimensions(canvas, window.innerWidth, window.innerHeight - 3.5 * 16) // header size = 3.5em
 
 window.addEventListener('load', _ => {
   let sightInViewer = new SightInViewer();
@@ -29,8 +28,10 @@ class SightInViewer {
       canvas
     });
 
-    renderer.setSize(canvas.width, canvas.height)
-    renderer.setPixelRatio(window.devicePixelRatio)
+
+    const dpr = window.devicePixelRatio
+    renderer.setSize(canvas.width / dpr, canvas.height / dpr)
+    renderer.setPixelRatio(dpr)
     renderer.setClearColor(new THREE.Color(0xeeeeee), 1.0)
     // TODO :  handle resize 
 
@@ -38,19 +39,24 @@ class SightInViewer {
       cameraUp: [0.0, -1.0, 0.0],
       initialCameraPosition: [-8.09653, -6.53072, -7.72696],
       initialCameraLookAt: [0, 1.95338, 1.51278],
-      sphericalHarmonicsDegree: 1,
+      sphericalHarmonicsDegree: 0,
       halfPrecisionCovariancesOnGPU: true,
       dynamicScene: false,
       splatRenderMode: GaussianSplats3D.RenderMode.ThreeD,
+      // sharedMemoryForWorkers: false,
+      // ignoreDevicePixelRatio: true,
+      // gpuAcceleratedSort: false,
+      // inMemoryCompressionLevel: 2,
+      // freeIntermediateSplatData: true,
       renderer
     })
 
     this.viewer.controls.enableDamping = false
 
-    DragHandler.initEvents(file => this.startViewerWithFile(file))
+    DragHandler.initEvents((file: File) => this.startViewerWithFile(file))
     if (DEBUG) {
       // Load the default scene
-      this.startViewerWithFile("./resources/models/BAM-1K-10K-2200p_60ksteps.ply")
+      this.startViewerWithFile("./models/BAM-1K-10K-2200p_60ksteps.ply")
     }
   }
 
