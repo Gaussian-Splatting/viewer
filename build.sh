@@ -2,11 +2,11 @@
 
 # install the dependencies
 git submodule update --init 
-# npm install 
+npm install 
 
 # Build the dependencies
 cd ./lib/GaussianSplats3D/
-npm install
+npm install 
 npm run build-library
 cd ../..
 
