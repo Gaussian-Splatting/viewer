@@ -5,17 +5,19 @@ export default defineConfig({
     publicDir: "resources",
     optimizeDeps: {
         include: ['@mkkellogg/gaussian-splats-3d'],
+        entries: ['index.html']
     },
     server: {
         watch: { usePolling: true }
     },
     resolve: {
         alias: {
+            // TODO: different alias for ssr / build
             '@mkkellogg/gaussian-splats-3d': './lib/GaussianSplats3D/build/gaussian-splats-3d.module.js'
         }
     },
     build: {
-        minify: false,
+        minify: true,
         rollupOptions: {}
     },
     plugins: [{

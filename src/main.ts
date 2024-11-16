@@ -3,11 +3,14 @@ import * as THREE from 'three';
 
 import { DragHandler } from './dragHandler'
 import { setCanvasDimensions } from './utils';
+import CameraControls from 'camera-controls';
 
+CameraControls.install({ THREE: THREE })
 
 // Load a default scene and prevent drag and drop
 // This flag should only be use directly during the development of the viewer
-const DEBUG = false
+const DEBUG = true
+const CAMERA_CUSTOM_ORBIT_POINT = false // not working
 
 const canvas = document.querySelector('canvas')!
 setCanvasDimensions(canvas, window.innerWidth, window.innerHeight - 3.5 * 16) // header size = 3.5em
@@ -28,7 +31,6 @@ class SightInViewer {
       canvas
     });
 
-
     const dpr = window.devicePixelRatio
     renderer.setSize(canvas.width / dpr, canvas.height / dpr)
     renderer.setPixelRatio(dpr)
@@ -40,18 +42,59 @@ class SightInViewer {
       initialCameraPosition: [-8.09653, -6.53072, -7.72696],
       initialCameraLookAt: [0, 1.95338, 1.51278],
       sphericalHarmonicsDegree: 0,
+      gpuAcceleratedSort: true,
       halfPrecisionCovariancesOnGPU: true,
       dynamicScene: false,
       splatRenderMode: GaussianSplats3D.RenderMode.ThreeD,
-      // sharedMemoryForWorkers: false,
-      // ignoreDevicePixelRatio: true,
-      // gpuAcceleratedSort: false,
-      // inMemoryCompressionLevel: 2,
-      // freeIntermediateSplatData: true,
+      useBuiltInControls: !CAMERA_CUSTOM_ORBIT_POINT,
       renderer
     })
 
-    this.viewer.controls.enableDamping = false
+    if (CAMERA_CUSTOM_ORBIT_POINT) {
+      this.viewer.controls = new CameraControls(this.viewer.camera, this.viewer.renderer.domElement)
+    } else {
+      this.viewer.controls.enableDamping = false
+    }
+
+
+    if (CAMERA_CUSTOM_ORBIT_POINT) {
+      // Change the controls to orbit around the mouse instead of the center point
+      this.viewer.onMouseDown = () => {
+        // Original implementation
+        this.viewer.mouseDownPosition.copy(this.viewer.mousePosition);
+        this.viewer.mouseDownTime = performance.now() / 1000;
+        // Raycast the mouse position to rotate the mouse
+        const renderDimensions = new THREE.Vector2();
+        let outHits = [];
+        this.viewer.getRenderDimensions(renderDimensions);
+        this.viewer.raycaster.setFromCameraAndScreenPosition(this.viewer.camera, this.viewer.mousePosition, renderDimensions);
+        this.viewer.raycaster.intersectSplatMesh(this.viewer.splatMesh, outHits);
+        if (outHits.length > 0) {
+          const hit = outHits[0];
+          const intersectionPoint = hit.origin;
+          console.log(intersectionPoint)
+          this.viewer.controls.setTarget(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z)
+          this.viewer.controls.setOrbitPoint(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z)
+          // Update camera
+          {
+            const tempVector = new THREE.Vector3();
+            const toLookAtDistance = 1 / (this.viewer.camera.zoom * 0.001);
+            tempVector.copy(intersectionPoint).sub(this.viewer.camera.position).normalize().multiplyScalar(toLookAtDistance).negate();
+            this.viewer.camera.position.copy(intersectionPoint).add(tempVector);
+          }
+
+          this.viewer.controls.update()
+        } else {
+          console.log('no hit')
+        }
+      }
+
+      // hack to have native controls
+      this.viewer.useBuiltInControls = true
+      this.viewer.setupEventHandlers()
+      this.viewer.useBuiltInControls = false
+
+    }
 
     DragHandler.initEvents((file: File) => this.startViewerWithFile(file))
     if (DEBUG) {
@@ -70,7 +113,7 @@ class SightInViewer {
     viewerAddFunction(file, {
       progressiveLoad: false, // Huge performance improvement
       format: GaussianSplats3D.SceneFormat.Ply,
-      onProgress: console.log
+      // onProgress: console.log
 
     }).then(() => { this.viewer.start() })
   }
