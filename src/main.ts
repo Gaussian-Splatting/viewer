@@ -36,6 +36,11 @@ class SightInViewer {
     renderer.setPixelRatio(dpr)
     renderer.setClearColor(new THREE.Color(0xeeeeee), 1.0)
     // TODO :  handle resize 
+    window.addEventListener('resize', () => {
+      const dpr = window.devicePixelRatio
+      this.viewer.renderer.setSize(canvas.width / dpr, canvas.height / dpr)
+      this.viewer.forceRenderNextFrame()
+    })
 
     this.viewer = new GaussianSplats3D.Viewer({
       cameraUp: [0.0, -1.0, 0.0],
