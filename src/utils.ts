@@ -5,3 +5,10 @@ export function setCanvasDimensions(canvas: HTMLCanvasElement, width: number, he
     canvas.style.width = width + 'px'
     canvas.style.height = height + 'px'
 }
+
+// Return the filename from a given path
+// ex : ./test/models/main.splat -> main.splat
+export function getFilenameFromPath(path: string): string {
+    const splitResult = path.split('/')
+    return splitResult[splitResult.length - 1]
+}
