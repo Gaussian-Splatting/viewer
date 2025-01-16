@@ -8,7 +8,8 @@ export default defineConfig({
         entries: ['index.html']
     },
     server: {
-        watch: { usePolling: true }
+        watch: { usePolling: true },
+        port: 3030,
     },
     resolve: {
         alias: {
